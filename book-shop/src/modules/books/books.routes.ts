@@ -5,15 +5,12 @@ import { createBook, getAllBooks, getMyBooks  } from "./books.controller";
 import { createBookSchema, queryBookSchema } from "./books.schema";
 
 const booksRouter = new Hono();
-
 booksRouter.use("/*", jwt({ secret: process.env.JWT_SECRET! }));
-
 booksRouter.post(
   "/create",
   zValidator("json", createBookSchema),
   createBook
 );
-
 booksRouter.get(
   "/all",
   zValidator("query", queryBookSchema), 
@@ -24,5 +21,4 @@ booksRouter.get(
   zValidator("query", queryBookSchema), 
   getMyBooks
 );
-
 export default booksRouter;
