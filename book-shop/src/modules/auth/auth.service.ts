@@ -5,6 +5,8 @@ import { sendEmail } from "../../utils/email";
 import { generateOtp } from "../../utils/generateOtp";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { generateToken } from "../../utils/generateToken";
+import { redisClient } from "../../config/redis";
 export const authService = {
   register: async (body: RegisterInput) => {
     const { email, password, name } = body;
@@ -103,12 +105,12 @@ export const authService = {
 
     try {
       await sendEmail(
-        email,
-        "إعادة إرسال كود التفعيل",
-        `<h1>أهلاً بك مرة أخرى يا ${user.name} 👋</h1>
-         <p>كود التفعيل الجديد هو:</p>
+          email,
+        "Verify your email",
+        `<h1>Hello ${name} 👋</h1>
+         <p>Verification code:</p>
          <h2 style="color: blue;">${newOtp}</h2>
-         <p>الكود صالح لمدة 3 دقائق فقط.</p>`
+         <p>Valid for 3 minutes only.</p>`
       );
     } catch (error) {
       console.error("Email sending failed:", error);
@@ -116,5 +118,37 @@ export const authService = {
 
     return { message: "OTP resent successfully" };
   },
-  login: async (body: LoginInput) => {},
+login: async (body: LoginInput) => {
+    const { email, password } = body;
+
+    const user = await db.query.UserTable.findFirst({
+        where: (table, { eq }) => eq(table.email, email),
+    });
+
+    if (!user) {
+        throw new Error("Invalid credentials");
+    }
+
+    if (!user.isActivated) {
+        throw new Error("User is not verified");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    
+    if (!isPasswordValid) {
+        throw new Error("Invalid credentials");
+    }
+
+    const token = await generateToken(user.id);
+
+    await redisClient.set(`user:${user.id}:token`, token, {
+        EX: 7 * 24 * 60 * 60,
+    });
+
+    return {
+        message: "Login successful",
+        token,
+        user: { id: user.id, name: user.name, email: user.email }
+    };
+},
 };

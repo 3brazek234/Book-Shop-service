@@ -35,7 +35,7 @@ export const login = async (c: Context) => {
     const body: LoginInput = await c.req.json();
     const result = await authService.login(body);
     
-    return c.json({ success: true, token: result.token }, 200);
+    return c.json({ success: true, token: result.token, user: result.user }, 200);
   } catch (error: any) {
     return c.json({ success: false, message: error.message }, 401);
   }
