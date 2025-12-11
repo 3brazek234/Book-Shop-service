@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { connectDB } from './config/db' // 👈 استدعاء دالة الاتصال
 import { authRouter } from './modules/auth/auth.routes'
 import booksRouter from './modules/books/books.routes'
+import {authorsRouter} from './modules/authors/authors.routes'
 import categoriesRouter from './modules/category/category.routes'
 import { cors } from 'hono/cors'; 
 const app = new Hono()
@@ -16,6 +17,7 @@ app.get('/', (c) => c.text('Hello Book Shop! 📚'))
 app.route('/auth', authRouter)
 app.route('/category', categoriesRouter)
 app.route('/books', booksRouter);
+app.route('/authors', authorsRouter);
 const startServer = async () => {
   try {
     await connectDB(); 

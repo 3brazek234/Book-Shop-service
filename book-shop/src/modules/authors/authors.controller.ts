@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { db } from "../../config/db";
 import { AuthorTable } from "../../db/schema";
 import { uploadToCloudinary } from "../../utils/cloudinary";
+import { eq } from "drizzle-orm";
 
 export const createAuthor = async (c: Context) => {
   try {
@@ -13,8 +14,12 @@ export const createAuthor = async (c: Context) => {
     if (imageFile && imageFile instanceof File) {
       imageUrl = await uploadToCloudinary(imageFile, "book-shop/authors");
     }
-    if (!name || name.length < 2) {
-      throw new Error("Name is required and must be 2+ chars");
+    const checkIsFound = await db
+      .select()
+      .from(AuthorTable)
+      .where(eq(AuthorTable.name, name));
+    if (checkIsFound.length > 0) {
+      return c.json({ success: false, message: "Author already exists" }, 400);
     }
     const [author] = await db
       .insert(AuthorTable)
@@ -27,5 +32,13 @@ export const createAuthor = async (c: Context) => {
     return c.json({ success: true, data: author });
   } catch (error: any) {
     return c.json({ success: false, message: error.message }, 400);
+  }
+};
+export const getAuyhors = async (c: Context) => {
+  try {
+    const authors = await db.select().from(AuthorTable);
+    return c.json({ success: true, data: authors });
+  } catch (error: any) {
+    return c.json({ success: false, message: error.message }, 500);
   }
 };
