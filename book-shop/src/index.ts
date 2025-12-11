@@ -2,11 +2,12 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { connectDB } from './config/db' // 👈 استدعاء دالة الاتصال
 import { authRouter } from './modules/auth/auth.routes'
+import booksRouter from './modules/books/books.routes'
 
 const app = new Hono()
 app.get('/', (c) => c.text('Hello Book Shop! 📚'))
 app.route('/auth', authRouter)
-
+app.route('/books', booksRouter);
 const startServer = async () => {
   try {
     await connectDB(); 
