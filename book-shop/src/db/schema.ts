@@ -27,6 +27,7 @@ export const AuthorTable = pgTable("authors", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
   bio: text("bio"),
+  image: text("image"),
 });
 
 export const CategoryTable = pgTable("categories", {
@@ -99,7 +100,6 @@ export const TagRelations = relations(TagTable, ({ many }) => ({
   books: many(BookTagsTable),
 }));
 
-// علاقات الجدول الوسيط (بيربط الاتنين ببعض)
 export const BookTagsRelations = relations(BookTagsTable, ({ one }) => ({
   book: one(BookTable, {
     fields: [BookTagsTable.bookId],

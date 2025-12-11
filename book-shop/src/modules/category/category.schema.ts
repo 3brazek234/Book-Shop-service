@@ -1,6 +1,7 @@
 import { z } from "zod";
-const createCategorySchema = z.object({
-    name: z.string().min(3, "name must be at least 3 characters"),
-})
 
-export type CreateCategoryInput = z.infer<typeof createCategorySchema>
+export const categorySchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+});
+
+export type CategoryInput = z.infer<typeof categorySchema>;
