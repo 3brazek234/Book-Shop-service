@@ -12,7 +12,24 @@ export const register = async (c: Context) => {
     return c.json({ success: false, message: error.message }, 400);
   }
 };
-
+export const verifyEmail = async (c: Context) => {
+  try {
+    const body = await c.req.json();
+    const result = await authService.verifyOtp(body);   
+    return c.json({ success: true, message: result.message }, 200);
+  } catch (error: any) {
+    return c.json({ success: false, message: error.message }, 400);
+  }
+};
+export const resendOtp = async (c: Context)=>{
+    try{
+        const body = await c.req.json();
+        const result = await authService.resendOtp(body);
+        return c.json({ success: true, message: result.message }, 200);
+    }catch(error:any){
+        return c.json({ success: false, message: error.message }, 400);
+    }
+}
 export const login = async (c: Context) => {
   try {
     const body: LoginInput = await c.req.json();

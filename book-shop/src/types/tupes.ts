@@ -14,3 +14,7 @@ export type User = {
     otp: string;
     otpExpiry: Date;
 }
+export type VerifyOtpInput = {
+    email: string;
+    otp: string;
+}
