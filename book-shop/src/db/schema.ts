@@ -47,10 +47,12 @@ export const BookTable = pgTable("books", {
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   coverImage: text("cover_image"),
   publicationYear: integer("publication_year"),
-  authorId: uuid("author_id").references(() => AuthorTable.id)
-  .notNull(),
-  categoryId: uuid("category_id").references(() => CategoryTable.id)
-  .notNull(),
+  authorId: uuid("author_id")
+    .references(() => AuthorTable.id)
+    .notNull(),
+  categoryId: uuid("category_id")
+    .references(() => CategoryTable.id)
+    .notNull(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -77,6 +79,10 @@ export const BookRelations = relations(BookTable, ({ one, many }) => ({
   category: one(CategoryTable, {
     fields: [BookTable.categoryId],
     references: [CategoryTable.id],
+  }),
+  user: one(UserTable, {
+    fields: [BookTable.userId],
+    references: [UserTable.id],
   }),
   tags: many(BookTagsTable),
 }));
