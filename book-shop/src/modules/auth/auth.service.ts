@@ -154,7 +154,7 @@ export const authService = {
     return {
       message: "Login successful",
       token,
-      user: { id: user.id, name: user.name, email: user.email },
+      user: { id: user.id, name: user.name, email: user.email, image: user.image },
     };
   },
   logout: async (userId: string) => {

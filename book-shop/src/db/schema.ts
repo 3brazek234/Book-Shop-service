@@ -15,6 +15,7 @@ export const UserTable = pgTable("users", {
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: text("password").notNull(),
+  image: text("image"),
   otp: varchar("otp", { length: 6 }),
   isActivated: boolean("is_activated").default(false),
   otpExpiry: timestamp("otp_expiry", { mode: "date" }),

@@ -29,6 +29,13 @@
       "when": 1765496502027,
       "tag": "0003_graceful_roulette",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1765538729348,
+      "tag": "0004_curved_earthquake",
+      "breakpoints": true
     }
   ]
 }

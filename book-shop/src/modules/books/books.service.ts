@@ -56,7 +56,7 @@ export const booksService = {
   },
   getMyBooks: async (userId: string, query: any) => {
     const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 10;
+    const limit = Number(query.limit) || 3;
     const offset = (page - 1) * limit;
     const search = query.search;
     const sort =
@@ -78,5 +78,28 @@ export const booksService = {
     });
 
     return books;
+  },
+  getBookById: async (id: string) => {
+    const book = await db.query.BookTable.findFirst({
+      where: eq(BookTable.id, id),
+      with: {
+        category: {
+          columns: { id: true, name: true },
+        },
+        author: {
+          columns: { id: true, name: true, image: true, bio: true },
+        },
+        user: {
+          columns: { id: true, name: true },
+        },
+        tags: {
+          with: {
+            tag: true,
+          },
+        },
+      },
+    });
+
+    return book;
   },
 };

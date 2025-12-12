@@ -1,8 +1,5 @@
-// src/utils/cloudinary.ts
 import { v2 as cloudinary } from 'cloudinary';
 import 'dotenv/config';
-
-// 1. إعداد الاتصال
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -10,13 +7,11 @@ cloudinary.config({
 });
 
 /**
- * دالة لرفع ملف (Buffer) إلى Cloudinary
- * @param fileBlob الملف اللي جاي من Hono
- * @param folder اسم الفولدر على Cloudinary (اختياري)
+ * @param fileBlob 
+ * @param folder 
  */
 export const uploadToCloudinary = async (fileBlob: Blob, folder: string = 'book-shop') => {
   try {
-    // تحويل الـ Blob إلى Buffer عشان Node.js يفهمه
     const arrayBuffer = await fileBlob.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 

@@ -1,20 +1,17 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { connectDB } from './config/db' // 👈 استدعاء دالة الاتصال
+import { connectDB } from './config/db'
 import { authRouter } from './modules/auth/auth.routes'
 import booksRouter from './modules/books/books.routes'
 import {authorsRouter} from './modules/authors/authors.routes'
 import categoriesRouter from './modules/category/category.routes'
 import { cors } from 'hono/cors'; 
+import { userRouter } from './modules/user/user.routes'
 const app = new Hono()
-app.use('/*', cors(
-  {
-    origin: "http://localhost:5173",
-    credentials: true,
-  }
-));
+app.use('/*', cors());
 app.get('/', (c) => c.text('Hello Book Shop! 📚'))
 app.route('/auth', authRouter)
+app.route('/user', userRouter)
 app.route('/category', categoriesRouter)
 app.route('/books', booksRouter);
 app.route('/authors', authorsRouter);
