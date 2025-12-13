@@ -6,51 +6,110 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { LogIn, LogOut } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { LogIn, User as UserIcon, LogOut, Settings } from "lucide-react";
+
 import { LoginForm } from "./LoginForm";
-import Signup from "./SignupForm";
 import SignupForm from "./SignupForm";
 import { AuthView } from "@/types";
 import { useAuth } from "@/providers/AuthProvider";
-// import { OtpForm } from "./OtpForm"; // لما تعملهم
-// import { ResetPasswordForm } from "./ResetPasswordForm";
 
 export const AuthModal = () => {
   const [view, setView] = useState<AuthView>("LOGIN");
   const [isOpen, setIsOpen] = useState(false);
-  const { isLoggedIn } = useAuth();
+  
+  // 1. Get User and Logout from context
+  const { isLoggedIn, user, logout } = useAuth();
+
   const getTitle = () => {
     switch (view) {
-      case "LOGIN":
-        return "Welcome Back";
-      case "SIGNUP":
-        return "Create Account";
-      case "FORGOT_PASSWORD":
-        return "Reset Password";
-      case "OTP":
-        return "Verify Email";
-      default:
-        return "Authentication";
+      case "LOGIN": return "Welcome Back";
+      case "SIGNUP": return "Create Account";
+      case "FORGOT_PASSWORD": return "Reset Password";
+      case "OTP": return "Verify Email";
+      default: return "Authentication";
     }
   };
 
+  // Helper to get initials for Avatar fallback
+  const getInitials = (name: string) => {
+    return name ? name.substring(0, 2).toUpperCase() : "U";
+  };
+
+  // 2. LOGGED IN VIEW: Render the User Dropdown
+  if (isLoggedIn && user) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger className="outline-none">
+          <Avatar className="cursor-pointer border-2 border-transparent hover:border-white/50 transition">
+            <AvatarImage src={user.image} alt={user.name} />
+            <AvatarFallback className="bg-[#5c3a9f] text-white">
+              {getInitials(user.name)}
+            </AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
+        
+        <DropdownMenuContent className="w-56" align="end">
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{user.name}</p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {user.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem className="cursor-pointer">
+            <UserIcon className="mr-2 h-4 w-4" />
+            <span>Edit Profile</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem className="cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem 
+            className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-100"
+            onClick={logout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  // 3. LOGGED OUT VIEW: Render the Login Dialog
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {isLoggedIn ? (
-          <LogOut />
-        ) : (
-          <LogIn
-            className="cursor-pointer text-white"
-            onClick={() => {
-              setView("LOGIN");
-              setIsOpen(true);
-            }}
-          />
-        )}
+        <LogIn
+          className="cursor-pointer text-white hover:text-gray-200 transition"
+          onClick={() => {
+            setView("LOGIN");
+            setIsOpen(true);
+          }}
+        />
       </DialogTrigger>
 
-      <DialogContent className="bg-gradient-to-br from-[#3d287d] to-[#5c3a9f] border-0 text-white p-0 overflow-hidden">
+      <DialogContent className="bg-gradient-to-br from-[#3d287d] to-[#5c3a9f] border-0 text-white p-0 overflow-hidden sm:max-w-[425px]">
         <div className="p-8">
           <DialogHeader className="mb-8">
             <DialogTitle className="text-2xl font-bold text-center mb-2">
@@ -58,14 +117,8 @@ export const AuthModal = () => {
             </DialogTitle>
           </DialogHeader>
 
-          {/* هنا السحر: بنعرض الكومبوننت حسب الـ State */}
           {view === "LOGIN" && <LoginForm onSwitchView={setView} />}
           {view === "SIGNUP" && <SignupForm onSwitchView={setView} />}
-
-          {/* مستقبلاً هتضيف دول بسهولة:
-            {view === "FORGOT_PASSWORD" && <ForgotPasswordForm onSwitchView={setView} />}
-            {view === "OTP" && <OtpForm onSwitchView={setView} />}
-          */}
         </div>
       </DialogContent>
     </Dialog>
