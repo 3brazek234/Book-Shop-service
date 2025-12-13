@@ -1,18 +1,30 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { getBooks } from "@/services"
-import { FilterSidebar, FilterState } from "@/features/books/components/FilterSidebar"
-import BookList from "@/features/books/components/BookList"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Filter } from "lucide-react"
-import toast from "react-hot-toast"
-import type { Book as ApiBook } from "@/types"
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getBooks } from "@/services";
+import {
+  FilterSidebar,
+  FilterState,
+} from "@/features/books/components/FilterSidebar";
+import BookList from "@/features/books/components/BookList";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Filter } from "lucide-react";
+import toast from "react-hot-toast";
+import type { Book as ApiBook } from "@/types";
+import { useAuth } from "@/providers/AuthProvider";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AddBook } from "@/features/books/components/AddBook";
 
 interface Book {
   id: string;
@@ -21,87 +33,108 @@ interface Book {
   coverImage: string;
   createdAt: Date | null;
   user: {
-    name: string
-  }
+    name: string;
+  };
 }
-
 export default function LibraryPage() {
-  const isMobile = useIsMobile()
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [page, setPage] = useState(1)
+  const isMobile = useIsMobile();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<FilterState>({
     search: "",
     sortBy: "createdAt",
     sortOrder: "desc",
-  })
-  const limit = 10
+  });
+  const limit = 10;
 
   const queryParams = {
     page,
     limit,
     search: filters.search || undefined,
-
-  }
-
+  };
+  const { isLoggedIn } = useAuth();
+  const [open, setOpen] = useState(false);
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["books", queryParams],
     queryFn: () => getBooks(queryParams),
-    staleTime: 1000 * 60 * 5, 
-  })
+    staleTime: 1000 * 60 * 5,
+  });
   useEffect(() => {
-    setPage(2)
-  }, [filters])
+    setPage(2);
+  }, [filters]);
 
   const handleFilterChange = (newFilters: FilterState) => {
-    setFilters(newFilters)
-  }
+    setFilters(newFilters);
+  };
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (error) {
-    toast.error("Failed to load books. Please try again.")
+    toast.error("Failed to load books. Please try again.");
   }
-
-
 
   const FilterSidebarContent = (
     <FilterSidebar
       onFilterChange={handleFilterChange}
       onClose={isMobile ? () => setIsSidebarOpen(false) : undefined}
     />
-  )
+  );
 
   return (
     <div className="min-h-screen">
       <div className="mx-auto px-4">
         {/* Header */}
-        <div className="mb-2">
+        <div className="mb-2 flex justify-between items-center pt-6">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-4xl font-bold text-white">Library</h1>
             {isMobile && (
               <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="icon" className="border-white/20 text-white">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="border-white/20 text-white"
+                  >
                     <Filter className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-80 p-0 bg-gray-900 border-white/10">
+                <SheetContent
+                  side="left"
+                  className="w-80 p-0 bg-gray-900 border-white/10"
+                >
                   {FilterSidebarContent}
                 </SheetContent>
               </Sheet>
             )}
           </div>
-          <p className="text-white/70">Browse and discover books from our collection</p>
+          {isLoggedIn && (
+            <Button
+              onClick={() => setOpen(true)}
+              variant="outline"
+              className="border-white/20 text-white"
+            >
+              Add Book +
+            </Button>
+          )}
         </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Add New Book</DialogTitle>
+              <DialogDescription>
+                Fill in the details below to add a new book to your store.
+              </DialogDescription>
+            </DialogHeader>
 
+            <AddBook setOpen={setOpen} />
+          </DialogContent>
+        </Dialog>
         <div className="flex gap-6">
           {!isMobile && (
-            <aside className="flex-shrink-0">
-              {FilterSidebarContent}
-            </aside>
+            <aside className="flex-shrink-0">{FilterSidebarContent}</aside>
           )}
 
           <main className="flex-1">
@@ -121,12 +154,14 @@ export default function LibraryPage() {
               </>
             ) : (
               <div className="text-center py-12">
-                <p className="text-white/70 text-lg">No books found. Try adjusting your filters.</p>
+                <p className="text-white/70 text-lg">
+                  No books found. Try adjusting your filters.
+                </p>
               </div>
             )}
           </main>
         </div>
       </div>
     </div>
-  )
+  );
 }

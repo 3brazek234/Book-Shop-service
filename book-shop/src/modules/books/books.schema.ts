@@ -5,7 +5,7 @@ export const createBookSchema = z.object({
   description: z.string().optional(),
   price: z.number().positive(), 
   categoryId: z.string().uuid(), 
-  thumbnail: z.string().url().optional(), 
+  thumbnail:optional(), 
   authorId: z.string().uuid(),
 });
 

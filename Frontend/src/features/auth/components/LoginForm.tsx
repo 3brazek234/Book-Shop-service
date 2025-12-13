@@ -9,106 +9,118 @@ import { login } from "@/services";
 import toast from "react-hot-toast";
 import { setAuthCookie } from "@/actions/auth";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers/AuthProvider"; // 1. استدعاء الهوك
 
 interface LoginFormProps {
     onSwitchView: (view: AuthView) => void;
 }
 
 export const LoginForm = ({ onSwitchView }: LoginFormProps) => {
-    const router = useRouter(); 
+    const router = useRouter();
+    
+    // 2. استخراج دالة التحديث وقفل المودال من الكونتكست
+    const { refetchUser, closeLoginModal } = useAuth(); 
+
     const form = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
         defaultValues: { email: "", password: "" },
     });
 
+    const { isSubmitting } = form.formState;
+
     const onSubmit = async (data: LoginInput) => {
         try {
-            const res = await login(data)
+            const res = await login(data);
             if (!res.success) {
-                toast.error("error in login")
+                toast.error(res.message || "Error in login");
+                return;
             }
-            await setAuthCookie(res.token)
-            toast.success("login successfully")
-            router.push("/dashboard");
-           
-        } catch (err) { console.log(err) }
+            await setAuthCookie(res.token);
+            await refetchUser(); 
+            toast.success("Login successfully");
+            closeLoginModal(); 
+            router.refresh(); 
+
+        } catch (err: any) {
+             console.error(err);
+             toast.error("Something went wrong");
+        }
     };
 
     return (
+        // تم إصلاح هيكل الفورم (Form واحد فقط)
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-6"
+                
+                {/* Email Field */}
+                <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="text-white">Email</FormLabel>
+                            <FormControl>
+                                <Input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-400"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                        </FormItem>
+                    )}
+                />
+
+                {/* Password Field */}
+                <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                        <FormItem>
+                            <div className="flex justify-between items-center">
+                                <FormLabel className="text-white">Password</FormLabel>
+                                <button
+                                    type="button"
+                                    onClick={() => onSwitchView("FORGOT_PASSWORD")}
+                                    className="text-xs text-amber-300 hover:underline cursor-pointer"
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
+                            <FormControl>
+                                <Input
+                                    type="password"
+                                    placeholder="••••••••"
+                                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-400"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormMessage className="text-red-400" />
+                        </FormItem>
+                    )}
+                />
+
+                {/* Sign Up Link */}
+                <p className="text-center text-sm text-white/70">
+                    Don't have an account?{" "}
+                    <button
+                        type="button"
+                        className="text-amber-300 hover:underline font-medium cursor-pointer"
+                        onClick={() => onSwitchView("SIGNUP")}
                     >
-                        {/* Email Field */}
-                        <FormField
-                            control={form.control}
-                            name="email"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Email</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="email"
-                                            placeholder="Enter your email"
-                                            className="bg-white/5 border-white/10"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage className="text-red-400" />
-                                </FormItem>
-                            )}
-                        />
-
-                        {/* Password Field */}
-                        <FormField
-                            control={form.control}
-                            name="password"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <div className="flex justify-between items-center">
-                                        <FormLabel>Password</FormLabel>
-                                        <a
-                                            href="#"
-                                            className="text-xs text-amber-300 hover:underline"
-                                        >
-                                            Forgot password?
-                                        </a>
-                                    </div>
-                                    <FormControl>
-                                        <Input
-                                            type="password"
-                                            placeholder="••••••••"
-                                            className="bg-white/5 border-white/10"
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormMessage className="text-red-400" />
-                                </FormItem>
-                            )}
-                        />
-
-                        <p className="text-center text-sm text-white/70">
-                            Don't have an account?{" "}
-                            <a
-                                href="#"
-                                className="text-amber-300 hover:underline font-medium"
-                                onClick={() => onSwitchView("SIGNUP")}
-                            >
-                                Sign up
-                            </a>
-                        </p>
-                    </form>
-                </Form>
-                <div className="flex justify-center">
-                    <button type="button" onClick={() => onSwitchView("FORGOT_PASSWORD")} className="text-xs text-amber-300">
-                        Forgot password?
+                        Sign up
                     </button>
-                </div>
+                </p>
 
-                <Button type="submit" className="w-full bg-amber-400 text-gray-900">Log In</Button>
+                {/* Submit Button (داخل الفورم مباشرة) */}
+                <Button 
+                    type="submit" 
+                    className="w-full bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? "Logging in..." : "Log In"}
+                </Button>
             </form>
         </Form>
     );

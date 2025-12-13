@@ -38,7 +38,7 @@ export const addBookFormSchema = z.object({
   title: z.string().min(1, "Title is required").max(255, "Title must be less than 255 characters"),
   description: z.string().optional(),
   price: z.string().min(1, "Price is required"),
-  coverImage: z.string().optional(),
+  thumbnail: z.string().optional(),
   publicationYear: z.string().optional(),
   authorId: z.string().uuid("Please select an author"),
   categoryId: z.string().uuid("Please select a category"),
@@ -62,11 +62,11 @@ export const addBookSchema = addBookFormSchema.transform((data) => {
     }
   }
 
-  let coverImage: string | undefined = undefined;
-  if (data.coverImage && data.coverImage !== "") {
+  let thumbnail: string | undefined = undefined;
+  if (data.thumbnail && data.thumbnail !== "") {
     try {
-      new URL(data.coverImage);
-      coverImage = data.coverImage;
+      new URL(data.thumbnail);
+      thumbnail = data.thumbnail;
     } catch {
       throw new Error("Invalid URL");
     }
@@ -76,7 +76,7 @@ export const addBookSchema = addBookFormSchema.transform((data) => {
     title: data.title,
     description: data.description,
     price,
-    coverImage,
+    thumbnail,
     publicationYear,
     authorId: data.authorId,
     categoryId: data.categoryId,

@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { User } from '@/types' 
 import { getMe } from '@/services/auth'
@@ -12,7 +12,7 @@ type AuthContextType = {
   isLoginModalOpen: boolean
   openLoginModal: () => void
   closeLoginModal: () => void
-  refetchUser: () => void 
+  refetchUser: () => Promise<void> // خليناها ترجع Promise عشان ننتظرها
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoginModalOpen: false,
   openLoginModal: () => {},
   closeLoginModal: () => {},
-  refetchUser: () => {},
+  refetchUser: async () => {},
 })
 
 export function AuthProvider({ 
@@ -37,7 +37,8 @@ export function AuthProvider({
   const { data: user, isLoading, refetch } = useQuery({
     queryKey: ['current-user'],
     queryFn: getMe,
-    enabled: initialIsLoggedIn, 
+    // 👇 التغيير 1: شيلنا enabled عشان نقدر نعمل refetch حتى لو بادئين guest
+    // enabled: initialIsLoggedIn, 
     retry: false, 
     staleTime: 1000 * 60 * 5,
   })
@@ -52,12 +53,15 @@ export function AuthProvider({
     await refetch()
   }
 
-  const isAuth = initialIsLoggedIn && !!user
+
+  const isAuth = !!user 
+
+
 
   return (
     <AuthContext.Provider value={{
       user: user || null,
-      isLoggedIn: isAuth,
+      isLoggedIn: isAuth, 
       isLoading,
       isLoginModalOpen,
       openLoginModal,

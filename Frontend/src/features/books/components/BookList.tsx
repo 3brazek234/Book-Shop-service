@@ -28,9 +28,9 @@ function BookList({ title, books, containerClassName }: BookListProps) {
                   <h3 className="text-sm font-semibold text-white overflow-hidden whitespace-nowrap text-ellipsis">
                     {book.title}
                   </h3>
-                  <p className="text-gray-400">{book?.category.name}</p>
+                  {/* <p className="text-gray-400">{book?.category.name}</p> */}
                   <p className="text-xs text-gray-400">{book.price}</p>
-               <p>added by: {book.user.name}</p>
+               {/* <p>added by: {book.user.name}</p> */}
                 </div>
               </div>
             );
