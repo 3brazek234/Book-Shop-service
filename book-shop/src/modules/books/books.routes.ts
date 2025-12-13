@@ -24,7 +24,7 @@ booksRouter.use("/*", authCookieBridge);
 booksRouter.post(
   "/create",
   jwt({ secret: process.env.JWT_SECRET! }),
-  zValidator("json", createBookSchema),
+  zValidator("form", createBookSchema),
   createBook
 );
 

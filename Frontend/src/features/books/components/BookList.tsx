@@ -1,9 +1,10 @@
 import React from "react";
 import BookCover from "./BookCover";
 import CartButtons from "./CartButtons";
+import { Books } from "../../../../types";
 interface BookListProps {
   title: string;
-  books: Book[];
+  books: Books[];
   containerClassName?: string;
 }
 function BookList({ title, books, containerClassName }: BookListProps) {
@@ -21,7 +22,7 @@ function BookList({ title, books, containerClassName }: BookListProps) {
                   <BookCover
                     variant="medium"
                     coverUrl={book.coverImage}
-                    coverColor={book.color}
+                    coverColor="012848"
                   />
                 </div>
                 <div className="flex flex-col gap-1 rounded-b-md w-3/4">
@@ -30,7 +31,7 @@ function BookList({ title, books, containerClassName }: BookListProps) {
                   </h3>
                   {/* <p className="text-gray-400">{book?.category.name}</p> */}
                   <p className="text-xs text-gray-400">{book.price}</p>
-               {/* <p>added by: {book.user.name}</p> */}
+          
                 </div>
               </div>
             );

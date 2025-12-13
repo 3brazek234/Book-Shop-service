@@ -24,7 +24,7 @@ export const getBooks = async (
   params?: BooksQueryParams
 ): Promise<BooksResponse> => {
   const response = await api.get("/books/all", { params });
-  console.log(response);
+  console.log("res",response);
   return response.data;
 };
 export const getAuthors = async () => {

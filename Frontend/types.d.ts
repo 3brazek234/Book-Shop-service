@@ -13,6 +13,28 @@ interface Book {
   summary: string;
   createdAt: Date | null;
 }
+export type Books = {
+  id: string
+  title: string
+  userId: string
+  description: string
+  price: string
+  coverImage: string
+  publicationYear: string
+  authorId: string
+  categoryId: string
+  createdAt: string
+  updatedAt: string
+  category: {
+    id: string
+    name: string
+  }
+  user: {
+    id: string
+    name: string
+    email: string
+  }
+}
 
 interface AuthCredentials {
   fullName: string;

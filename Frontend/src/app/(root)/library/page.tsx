@@ -45,11 +45,10 @@ export default function LibraryPage() {
     sortBy: "createdAt",
     sortOrder: "desc",
   });
-  const limit = 10;
+  const limit = 2;
 
   const queryParams = {
-    page,
-    limit,
+  
     search: filters.search || undefined,
   };
   const { isLoggedIn } = useAuth();
@@ -59,6 +58,7 @@ export default function LibraryPage() {
     queryFn: () => getBooks(queryParams),
     staleTime: 1000 * 60 * 5,
   });
+  console.log("Books data:", data);
   useEffect(() => {
     setPage(2);
   }, [filters]);

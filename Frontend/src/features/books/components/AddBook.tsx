@@ -34,7 +34,7 @@ export const AddBook = ({
   setOpen,
 }: AddBookProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [coverImage, setCoverImage] = useState<File | null>(null);
   const form = useForm<AddBookFormInput>({
     resolver: zodResolver(addBookFormSchema),
     defaultValues: {
@@ -48,47 +48,46 @@ export const AddBook = ({
     },
   });
 
-   
-const { data , isLoading: authorDataLoader } = useQuery({
-    queryKey: ['authors'],
-    queryFn: () => getAuthors() 
-});
+  const { data, isLoading: authorDataLoader } = useQuery({
+    queryKey: ["authors"],
+    queryFn: () => getAuthors(),
+  });
 
-const {data: categoryData, isLoading: categoryDataLoader} = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => getCategories() 
-});
-const onSubmit = async (data: AddBookFormInput) => {
+  const { data: categoryData, isLoading: categoryDataLoader } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => getCategories(),
+  });
+  const onSubmit = async (data: AddBookFormInput) => {
+    // تحقق يدوي إن الصورة موجودة (لو هي إجباري)
+    if (!coverImage) {
+      toast.error("Please upload a cover image");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // 1. تجهيز البيانات الأساسية
       const formData = new FormData();
-      
-      formData.append('title', data.title);
-      formData.append('description', data.description || '');
-      formData.append('price', data.price); // ابعتها string عادي والباك إند يهندلها أو حولها
-      formData.append('authorId', data.authorId);
-      formData.append('categoryId', data.categoryId);
 
+      // 1. البيانات اللي جاية من React Hook Form
+      formData.append("title", data.title);
+      formData.append("price", data.price.toString());
+      formData.append("categoryId", data.categoryId);
+      formData.append("authorId", data.authorId);
+      formData.append("description", data.description || "");
       if (data.publicationYear) {
-        formData.append('publicationYear', data.publicationYear);
+        formData.append("publicationYear", data.publicationYear.toString());
       }
 
-      // 2. إضافة الصورة (الملف)
-      // data.thumbnail هنا هو الملف اللي جاي من الـ Input
-      if (data.thumbnail) {
-        formData.append('thumbnail', data.thumbnail);
-      }
+      // 2. الصورة اللي جاية من الـ State
+      formData.append("thumbnail", coverImage); // 👈 هنا مربط الفرس
 
-      // 3. إرسال الـ formData مباشرة
-      // ملاحظة: تأكد إن دالة createBook بتقبل FormData
+      console.log("Sending Form Data...");
+
       await createBook(formData);
-
       toast.success("Book added successfully! 📚");
       form.reset();
       onSuccess?.(); // لو جاي من مودال، اقفله
       setOpen?.(false); // لو جاي من Props
-
     } catch (error: any) {
       console.error("Error adding book:", error);
       toast.error(
@@ -97,7 +96,7 @@ const onSubmit = async (data: AddBookFormInput) => {
     } finally {
       setIsSubmitting(false);
     }
-};
+  };
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-xl border border-white/10 shadow-2xl backdrop-blur-sm">
@@ -202,25 +201,28 @@ const onSubmit = async (data: AddBookFormInput) => {
             />
           </div>
 
-          {/* Cover Image URL Field */}
-          <FormField
-            control={form.control}
-            name="thumbnail"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-white/90">Cover Image URL</FormLabel>
-                <FormControl>
-                  <Input
-                    type="file"
-                    placeholder="https://example.com/book-cover.jpg"
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-amber-400/50"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
+          {/* Cover Image URL Field - مفصول عن React Hook Form */}
+          <div className="space-y-2">
+            <FormLabel className="text-white/90">Cover Image</FormLabel>
+            <Input
+              type="file"
+              accept="image/*"
+              className="bg-white/5 border-white/10 text-white file:bg-amber-400 file:text-gray-900 hover:file:bg-amber-500 cursor-pointer"
+              // 👇 هنا بنخزن الملف في الـ State بتاعتنا مباشرة
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setCoverImage(file);
+                }
+              }}
+            />
+            {/* لو عايز تعرض رسالة خطأ يدوية لو مفيش صورة */}
+            {!coverImage && isSubmitting && (
+              <p className="text-sm font-medium text-red-400">
+                Cover image is required
+              </p>
             )}
-          />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Author Dropdown */}

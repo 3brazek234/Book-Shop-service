@@ -3,10 +3,12 @@ import { z } from "zod";
 export const createBookSchema = z.object({
   title: z.string().min(3),
   description: z.string().optional(),
-  price: z.number().positive(), 
-  categoryId: z.string().uuid(), 
-thumbnail: z
-    .instanceof(File, { message: "Cover image is required" }) 
+  price: z.string(), 
+  categoryId: z.string().uuid(),
+  authorId: z.string().uuid(),
+  thumbnail: z.custom<File>((val) => {
+    return val instanceof File || typeof val === 'string' || val === undefined || val === null;
+  }).optional(),
 });
 
 export const queryBookSchema = z.object({
