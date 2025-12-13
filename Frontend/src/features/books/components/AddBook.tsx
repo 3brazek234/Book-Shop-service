@@ -58,46 +58,37 @@ const {data: categoryData, isLoading: categoryDataLoader} = useQuery({
     queryKey: ['categories'],
     queryFn: () => getCategories() 
 });
-  const onSubmit = async (data: AddBookFormInput) => {
+const onSubmit = async (data: AddBookFormInput) => {
     setIsSubmitting(true);
     try {
-      const price = parseFloat(data.price);
-      if (isNaN(price) || price <= 0) {
-        toast.error("Price must be a valid number greater than 0");
-        setIsSubmitting(false);
-        return;
+      // 1. تجهيز البيانات الأساسية
+      const formData = new FormData();
+      
+      formData.append('title', data.title);
+      formData.append('description', data.description || '');
+      formData.append('price', data.price); // ابعتها string عادي والباك إند يهندلها أو حولها
+      formData.append('authorId', data.authorId);
+      formData.append('categoryId', data.categoryId);
+
+      if (data.publicationYear) {
+        formData.append('publicationYear', data.publicationYear);
       }
 
-      let publicationYear: number | undefined = undefined;
-      if (data.publicationYear && data.publicationYear !== "") {
-        const year = parseInt(data.publicationYear);
-        if (!isNaN(year) && year >= 1000 && year <= new Date().getFullYear()) {
-          publicationYear = year;
-        }
+      // 2. إضافة الصورة (الملف)
+      // data.thumbnail هنا هو الملف اللي جاي من الـ Input
+      if (data.thumbnail) {
+        formData.append('thumbnail', data.thumbnail);
       }
-  const formData = new FormData();
-  formData.append('thumbnail', data.thumbnail as unknown as Blob);
-  formData.append('title', data.title);
-  formData.append('description', data.description || '');
-  formData.append('price', price.toString());
-  formData.append('authorId', data.authorId);
-  formData.append('categoryId', data.categoryId);
 
+      // 3. إرسال الـ formData مباشرة
+      // ملاحظة: تأكد إن دالة createBook بتقبل FormData
+      await createBook(formData);
 
-      const bookData: AddBookInput & { userId: string } = {
-        title: data.title,
-        description: data.description,
-        price,
-        thumbnail,
-        authorId: data.authorId,
-        categoryId: data.categoryId,
-        
-      };
-
-      await createBook(bookData);
       toast.success("Book added successfully! 📚");
       form.reset();
-      onSuccess?.();
+      onSuccess?.(); // لو جاي من مودال، اقفله
+      setOpen?.(false); // لو جاي من Props
+
     } catch (error: any) {
       console.error("Error adding book:", error);
       toast.error(
@@ -106,7 +97,7 @@ const {data: categoryData, isLoading: categoryDataLoader} = useQuery({
     } finally {
       setIsSubmitting(false);
     }
-  };
+};
 
   return (
     <div className="w-full max-w-2xl mx-auto p-6 bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-xl border border-white/10 shadow-2xl backdrop-blur-sm">

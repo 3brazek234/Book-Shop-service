@@ -17,15 +17,12 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onSwitchView }: LoginFormProps) => {
     const router = useRouter();
-    
-    // 2. استخراج دالة التحديث وقفل المودال من الكونتكست
-    const { refetchUser, closeLoginModal } = useAuth(); 
-
+        const { refetchUser, closeLoginModal } = useAuth(); 
     const form = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
         defaultValues: { email: "", password: "" },
     });
-
+   
     const { isSubmitting } = form.formState;
 
     const onSubmit = async (data: LoginInput) => {

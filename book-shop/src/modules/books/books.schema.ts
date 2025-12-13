@@ -5,8 +5,8 @@ export const createBookSchema = z.object({
   description: z.string().optional(),
   price: z.number().positive(), 
   categoryId: z.string().uuid(), 
-  thumbnail:optional(), 
-  authorId: z.string().uuid(),
+thumbnail: z
+    .instanceof(File, { message: "Cover image is required" }) 
 });
 
 export const queryBookSchema = z.object({
