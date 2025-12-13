@@ -119,6 +119,7 @@ export const AuthModal = () => {
 
           {view === "LOGIN" && <LoginForm onSwitchView={setView} />}
           {view === "SIGNUP" && <SignupForm onSwitchView={setView} />}
+          {view === "FORGOT_PASSWORD" && <ForgetPassForm onSwitchView={setView}/>}
         </div>
       </DialogContent>
     </Dialog>
