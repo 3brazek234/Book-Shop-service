@@ -30,7 +30,7 @@ function BookCover({
         className
       )}
     >
-      <BookCoverSvg coverColor={coverColor} />
+      <BookCoverSvg coverColor="#012848" />
       <div
         className="absolute z-10"
         style={{ left: "12%", width: "87.5%", height: "88%" }}

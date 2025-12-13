@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 import { Roboto } from "next/font/google"; // 1. استدعاء الفونت
+import Provider from "@/providers/MainProvider";
 
 const roboto = Roboto({
   subsets: ["latin"], // مهم: أضف 'arabic' لدعم اللغة العربية
@@ -32,7 +33,11 @@ export default function RootLayout({
       <body
         className={`${roboto.className} ${bebasNeue.variable} antialiased`}
       >
-        {children}
+        <Provider>
+          {children}
+
+        </Provider>
+
       </body>
     </html>
   );

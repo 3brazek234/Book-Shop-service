@@ -25,7 +25,7 @@ const SignupForm = ({ onSwitchView }: SignUpProps) => {
             const response = await signup(data);
             console.log(response);
             toast.success("Signup successful");
-            // ممكن هنا تعمل switch لصفحة الـ login أو otp
+            
         } catch (error) {
             toast.error("Signup failed");
             console.error(error);

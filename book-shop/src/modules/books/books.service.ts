@@ -28,15 +28,16 @@ export const booksService = {
     if (search) {
       whereConditions.push(ilike(BookTable.title, `%${search}%`));
     }
+   
     const books = await db.query.BookTable.findMany({
       where: and(...whereConditions),
       limit: limit,
       offset: offset,
-      with: {
+        with: {
         category: {
           columns: {
             id: true,
-            name: true, // هات اسم القسم بس
+            name: true, 
           },
         },
         user: {
@@ -47,7 +48,7 @@ export const booksService = {
           },
         },
       },
-    });
+      }); 
     if (!books) {
       throw new Error("Books not found");
     }

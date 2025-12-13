@@ -8,7 +8,10 @@ import categoriesRouter from './modules/category/category.routes'
 import { cors } from 'hono/cors'; 
 import { userRouter } from './modules/user/user.routes'
 const app = new Hono()
-app.use('/*', cors());
+app.use('/*', cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+}));
 app.get('/', (c) => c.text('Hello Book Shop! 📚'))
 app.route('/auth', authRouter)
 app.route('/user', userRouter)

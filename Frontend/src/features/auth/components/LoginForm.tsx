@@ -5,19 +5,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AuthView } from "@/types";
+import { login } from "@/services";
+import toast from "react-hot-toast";
+import { setAuthCookie } from "@/actions/auth";
+import { useRouter } from "next/navigation";
 
 interface LoginFormProps {
     onSwitchView: (view: AuthView) => void;
 }
 
 export const LoginForm = ({ onSwitchView }: LoginFormProps) => {
+    const router = useRouter(); 
     const form = useForm<LoginInput>({
         resolver: zodResolver(loginSchema),
         defaultValues: { email: "", password: "" },
     });
 
     const onSubmit = async (data: LoginInput) => {
-        console.log(data);
+        try {
+            const res = await login(data)
+            if (!res.success) {
+                toast.error("error in login")
+            }
+            await setAuthCookie(res.token)
+            toast.success("login successfully")
+            router.push("/dashboard");
+           
+        } catch (err) { console.log(err) }
     };
 
     return (

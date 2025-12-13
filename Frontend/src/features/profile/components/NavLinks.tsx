@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"; // استدعاء دالة cn للمساعدة
 // 1. عرّفنا اللينكات في مصفوفة لسهولة التعديل
 const links = [
   { href: "/", label: "Home" },
-  { href: "/library", label: "Library" },
+  { href: "library", label: "Library" },
   { href: "/authors", label: "Authors" },
   { href: "/category", label: "Category" },
 ];

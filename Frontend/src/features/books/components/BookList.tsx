@@ -12,7 +12,7 @@ function BookList({ title, books, containerClassName }: BookListProps) {
       <h2 className="text-2xl md:text-3xl !text-white font-bebas-neue">
         {title}
       </h2>
-      <div className="mt-12 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6">
+      <div className="mt-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-6">
         {books ? (
           books.map((book, index) => {
             return (
@@ -20,7 +20,7 @@ function BookList({ title, books, containerClassName }: BookListProps) {
                 <div className="hover:scale-105 transition-transform duration-300 cursor-pointer">
                   <BookCover
                     variant="medium"
-                    coverUrl={book.cover}
+                    coverUrl={book.coverImage}
                     coverColor={book.color}
                   />
                 </div>
@@ -28,9 +28,10 @@ function BookList({ title, books, containerClassName }: BookListProps) {
                   <h3 className="text-sm font-semibold text-white overflow-hidden whitespace-nowrap text-ellipsis">
                     {book.title}
                   </h3>
-                  <p className="text-xs text-gray-400">{book.genre}</p>
+                  <p className="text-gray-400">{book?.category.name}</p>
+                  <p className="text-xs text-gray-400">{book.price}</p>
+               <p>added by: {book.user.name}</p>
                 </div>
-                <CartButtons />
               </div>
             );
           })

@@ -12,7 +12,6 @@ export const AuthModal = () => {
   const [view, setView] = useState<AuthView>("LOGIN");
   const [isOpen, setIsOpen] = useState(false);
 
-  // دالة بترجع العنوان المناسب لكل صفحة
   const getTitle = () => {
     switch (view) {
       case "LOGIN": return "Welcome Back";
