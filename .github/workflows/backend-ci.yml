@@ -3,7 +3,6 @@ name: book-shop CI Pipeline
 on:
   push:
     branches: [ "main" ]
-    # 👇 ده مهم جداً: هيشتغل بس لو التغيير حصل جوه فولدر book-shop
     paths:
       - 'book-shop/**'
   pull_request:
