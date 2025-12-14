@@ -14,12 +14,12 @@ export const booksService = {
         categoryId: data.categoryId,
         authorId: data.authorId,
         userId: userId,
-        coverImage: data.thumbnail,
+        coverImage: data.thumbnail as string | undefined,
       })
       .returning();
     return newBook;
   },
-getAllBooks: async (query: any) => {
+  getAllBooks: async (query: any) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 5;
     const offset = (page - 1) * limit;
@@ -36,18 +36,21 @@ getAllBooks: async (query: any) => {
 
     // 2. تحديد منطق الترتيب
     let orderByCondition;
-    
+
     // بنشوف المستخدم عايز يرتب بإيه، وبنرجع العمود المناسب من الجدول
     switch (sortBy) {
       case "price":
-        orderByCondition = sortOrder === "asc" ? asc(BookTable.price) : desc(BookTable.price);
+        orderByCondition =
+          sortOrder === "asc" ? asc(BookTable.price) : desc(BookTable.price);
         break;
       case "title":
-        orderByCondition = sortOrder === "asc" ? asc(BookTable.title) : desc(BookTable.title);
+        orderByCondition =
+          sortOrder === "asc" ? asc(BookTable.title) : desc(BookTable.title);
         break;
-      case "createdAt": 
+      case "createdAt":
       default:
-        orderByCondition = sortOrder === "asc" ? asc(BookTable.id) : desc(BookTable.id);
+        orderByCondition =
+          sortOrder === "asc" ? asc(BookTable.id) : desc(BookTable.id);
         break;
     }
 
@@ -78,7 +81,7 @@ getAllBooks: async (query: any) => {
     }
 
     return books;
-},
+  },
   getMyBooks: async (userId: string, query: any) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 3;

@@ -6,9 +6,12 @@ export const createBookSchema = z.object({
   price: z.string(), 
   categoryId: z.string().uuid(),
   authorId: z.string().uuid(),
-  thumbnail: z.custom<File>((val) => {
-    return val instanceof File || typeof val === 'string' || val === undefined || val === null;
-  }).optional(),
+  publicationYear: z.preprocess((val) => Number(val), z.number().optional()), 
+  
+  thumbnail: z.union([
+    z.custom<File>((val) => val instanceof File), 
+    z.string()
+  ]).optional().nullable(),
 });
 
 export const queryBookSchema = z.object({
