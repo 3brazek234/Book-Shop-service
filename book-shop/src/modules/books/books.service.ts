@@ -19,25 +19,48 @@ export const booksService = {
       .returning();
     return newBook;
   },
-  getAllBooks: async (query: any) => {
+getAllBooks: async (query: any) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 5;
     const offset = (page - 1) * limit;
     const search = query.search;
+
+    // 1. استقبال باراميترات الترتيب
+    const sortBy = query.sortBy || "createdAt"; // القيمة الافتراضية
+    const sortOrder = query.sortOrder || "desc"; // القيمة الافتراضية (الأحدث أولاً)
+
     const whereConditions = [];
     if (search) {
       whereConditions.push(ilike(BookTable.title, `%${search}%`));
     }
-   
+
+    // 2. تحديد منطق الترتيب
+    let orderByCondition;
+    
+    // بنشوف المستخدم عايز يرتب بإيه، وبنرجع العمود المناسب من الجدول
+    switch (sortBy) {
+      case "price":
+        orderByCondition = sortOrder === "asc" ? asc(BookTable.price) : desc(BookTable.price);
+        break;
+      case "title":
+        orderByCondition = sortOrder === "asc" ? asc(BookTable.title) : desc(BookTable.title);
+        break;
+      case "createdAt": 
+      default:
+        orderByCondition = sortOrder === "asc" ? asc(BookTable.id) : desc(BookTable.id);
+        break;
+    }
+
     const books = await db.query.BookTable.findMany({
-      where: and(...whereConditions),
+      where: whereConditions.length > 0 ? and(...whereConditions) : undefined,
       limit: limit,
       offset: offset,
-        with: {
+      orderBy: orderByCondition,
+      with: {
         category: {
           columns: {
             id: true,
-            name: true, 
+            name: true,
           },
         },
         user: {
@@ -48,13 +71,14 @@ export const booksService = {
           },
         },
       },
-      }); 
+    });
+
     if (!books) {
       throw new Error("Books not found");
     }
 
     return books;
-  },
+},
   getMyBooks: async (userId: string, query: any) => {
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 3;

@@ -33,7 +33,13 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-// Form input schema (accepts strings from form inputs)
+export const updateProfileSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  email: z.string().email("Invalid email"),
+  image: z.instanceof(File).optional(),
+});
+
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export const addBookFormSchema = z.object({
   title: z.string().min(1, "Title is required").max(255, "Title must be less than 255 characters"),
   description: z.string().optional(),

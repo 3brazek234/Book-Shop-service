@@ -28,7 +28,7 @@ export const authService = {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const otp = generateOtp();
-    const otpExpiry = new Date(Date.now() + 3 * 60 * 1000);
+    const otpExpiry = new Date(Date.now() + 3 * 60 * 10000);
 
     const [newUser] = await db
       .insert(UserTable)

@@ -13,26 +13,23 @@ interface SignUpProps {
 }
 
 const SignupForm = ({ onSwitchView }: SignUpProps) => {
-    // 1. تعريف الفورم
     const signupForm = useForm<RegisterInput>({
         resolver: zodResolver(registerSchema),
         defaultValues: { email: "", password: "", name: "" },
     });
 
-    // 2. دالة الإرسال (Logic فقط بدون return للـ UI)
     const onSignupSubmit = async (data: RegisterInput) => {
         try {
             const response = await signup(data);
             console.log(response);
-            toast.success("Signup successful");
-            
+            toast.success("Signup successful ! OTP sent to your email.");
+            onSwitchView("OTP");
         } catch (error) {
             toast.error("Signup failed");
             console.error(error);
         }
-    }; // <--- قفلنا دالة الـ submit هنا
+    };
 
-    // 3. الـ Return الخاص بالكومبوننت نفسه (هنا بنرجع الـ JSX)
     return (
         <Form {...signupForm}>
             <form

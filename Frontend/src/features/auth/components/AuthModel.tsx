@@ -25,13 +25,15 @@ import { LoginForm } from "./LoginForm";
 import SignupForm from "./SignupForm";
 import { AuthView } from "@/types";
 import { useAuth } from "@/providers/AuthProvider";
+import ForgetPassForm from "./ForgetPassForm";
+import VerifyAccount from "./VerifyAccount";
 
 export const AuthModal = () => {
-  const [view, setView] = useState<AuthView>("LOGIN");
+  const [view, setView] = useState<AuthView>("SIGNUP");
   const [isOpen, setIsOpen] = useState(false);
   
   // 1. Get User and Logout from context
-  const { isLoggedIn, user, logout } = useAuth();
+  const { isLoggedIn, user } = useAuth();
 
   const getTitle = () => {
     switch (view) {
@@ -42,59 +44,10 @@ export const AuthModal = () => {
       default: return "Authentication";
     }
   };
-
-  // Helper to get initials for Avatar fallback
-  const getInitials = (name: string) => {
-    return name ? name.substring(0, 2).toUpperCase() : "U";
-  };
+console.log("User in AuthModal:", user);
 
   // 2. LOGGED IN VIEW: Render the User Dropdown
-  if (isLoggedIn && user) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger className="outline-none">
-          <Avatar className="cursor-pointer border-2 border-transparent hover:border-white/50 transition">
-            <AvatarImage src={user.image} alt={user.name} />
-            <AvatarFallback className="bg-[#5c3a9f] text-white">
-              {getInitials(user.name)}
-            </AvatarFallback>
-          </Avatar>
-        </DropdownMenuTrigger>
-        
-        <DropdownMenuContent className="w-56" align="end">
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user.name}</p>
-              <p className="text-xs leading-none text-muted-foreground">
-                {user.email}
-              </p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          
-          <DropdownMenuItem className="cursor-pointer">
-            <UserIcon className="mr-2 h-4 w-4" />
-            <span>Edit Profile</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuItem className="cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </DropdownMenuItem>
-          
-          <DropdownMenuSeparator />
-          
-          <DropdownMenuItem 
-            className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-100"
-            onClick={logout}
-          >
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
+  
 
   // 3. LOGGED OUT VIEW: Render the Login Dialog
   return (
@@ -120,6 +73,7 @@ export const AuthModal = () => {
           {view === "LOGIN" && <LoginForm onSwitchView={setView} />}
           {view === "SIGNUP" && <SignupForm onSwitchView={setView} />}
           {view === "FORGOT_PASSWORD" && <ForgetPassForm onSwitchView={setView}/>}
+          {view === "OTP" && <VerifyAccount/>}
         </div>
       </DialogContent>
     </Dialog>

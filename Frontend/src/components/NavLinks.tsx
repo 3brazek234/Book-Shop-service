@@ -9,7 +9,7 @@ const links = [
   { href: "/", label: "Home" },
   { href: "library", label: "Library" },
   { href: "/authors", label: "Authors" },
-  { href: "/category", label: "Category" },
+  { href: "/profile", label: "Profile" },
 ];
 
 export default function NavLinks({ className }: { className?: string }) {

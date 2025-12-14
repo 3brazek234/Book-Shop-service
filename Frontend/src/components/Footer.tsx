@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Logo from "@/components/ui/Logo";
 import SocialIcons from "@/components/SocialIcons";
-import NavLinks from "@/features/profile/components/NavLinks";
+import NavLinks from "@/components/NavLinks";
 
 const currentYear = new Date().getFullYear();
 

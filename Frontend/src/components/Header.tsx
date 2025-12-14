@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Logo from "@/components/ui/Logo";
-import NavLinks from "@/features/profile/components/NavLinks";
+import NavLinks from "@/components/NavLinks";
 import SideBar from "../features/auth/components/SideBar";
 import { ShoppingCart } from "lucide-react";
 import { AuthModal } from "../features/auth/components/AuthModel";

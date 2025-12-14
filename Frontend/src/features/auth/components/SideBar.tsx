@@ -3,7 +3,7 @@ import { Sheet, SheetContent, SheetFooter, SheetTrigger } from '@/components/ui/
 import { Button } from '@/components/ui/button'
 import { Menu } from 'lucide-react'
 import Logo from '@/components/ui/Logo'
-import NavLinks from '@/features/profile/components/NavLinks'
+import NavLinks from '@/components/NavLinks'
 import SocialIcons from '@/components/SocialIcons'
 
 function SideBar() {
