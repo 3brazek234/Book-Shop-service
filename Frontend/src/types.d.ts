@@ -55,6 +55,7 @@ export interface Book {
 export interface User {
   id: string
   email: string
+  image?: string
   name: string
   role?: "admin" | "user"
   createdAt?: Date

@@ -43,3 +43,22 @@ export const getBookById = async (id: string) => {
   return response.data;
 }
 
+
+export const updateProfile = async (data: { name: string; email: string; image?: File }): Promise<User> => {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+    if (data.image) {
+        formData.append('image', data.image);
+    }
+    const response = await api.post("/user", formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    return response.data;
+};
+export const logoutUser = async () => {
+  const response = await api.post("/auth/logout");
+  return response.data;
+}

@@ -1,6 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 // 1. تعريف شكل بيانات المؤلف
 type Author = {
@@ -29,7 +34,7 @@ const initialAuthors: Author[] = [
 export default function AuthorsList() {
   const [authors, setAuthors] = useState<Author[]>(initialAuthors)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  
+
   // State للبيانات الجديدة
   const [newAuthor, setNewAuthor] = useState({ name: '', bio: '', image: '' })
 
@@ -52,104 +57,100 @@ export default function AuthorsList() {
 
   return (
     <section className="p-8 min-h-screen">
-      
       {/* Header + Add Button */}
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-white">Authors</h2>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2"
-        >
-          <span>+ Add Author</span>
-        </button>
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-amber-400 hover:bg-amber-500 text-gray-900 font-medium">
+              + Add Author
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-gray-900 border border-white/10">
+            <DialogHeader>
+              <DialogTitle className="text-white">إضافة مؤلف جديد</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddAuthor} className="space-y-4">
+              <div>
+                <Label htmlFor="name" className="text-white">اسم المؤلف</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  required
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/50"
+                  value={newAuthor.name}
+                  onChange={(e) => setNewAuthor({...newAuthor, name: e.target.value})}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="image" className="text-white">صورة (رابط URL)</Label>
+                <Input
+                  id="image"
+                  type="text"
+                  placeholder="https://example.com/image.jpg"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/50"
+                  value={newAuthor.image}
+                  onChange={(e) => setNewAuthor({...newAuthor, image: e.target.value})}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="bio" className="text-white">نبذة (Bio)</Label>
+                <Textarea
+                  id="bio"
+                  rows={3}
+                  required
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/50"
+                  value={newAuthor.bio}
+                  onChange={(e) => setNewAuthor({...newAuthor, bio: e.target.value})}
+                />
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <Button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  variant="outline"
+                  className="flex-1 border-white/10 text-white hover:bg-white/5"
+                >
+                  إلغاء
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-amber-400 hover:bg-amber-500 text-gray-900 font-medium"
+                >
+                  حفظ
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Grid of Authors */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {authors.map((author) => (
-          <div key={author.id} className="rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow border border-gray-100">
+          <div key={author.id} className="rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
             {/* Image Area */}
-            <div className="h-48 w-full bg-gray-200 relative">
-              <img 
-                src={author.image} 
+            <div className="h-48 w-full bg-gray-800 relative">
+              <img
+                src={author.image}
                 alt={author.name}
                 className="w-full h-full object-cover"
               />
             </div>
-            
+
             {/* Content Area */}
-            <div className="p-5 ">
+            <div className="p-5">
               <h3 className="text-xl font-bold mb-2 text-white">{author.name}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+              <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
                 {author.bio}
               </p>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Modal / Popup for Adding Author */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-            <div className="p-6">
-              <h3 className="text-2xl font-bold mb-4">إضافة مؤلف جديد</h3>
-              
-              <form onSubmit={handleAddAuthor} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">اسم المؤلف</label>
-                  <input 
-                    type="text"
-                    required
-                    className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={newAuthor.name}
-                    onChange={(e) => setNewAuthor({...newAuthor, name: e.target.value})}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">صورة (رابط URL)</label>
-                  <input 
-                    type="text"
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={newAuthor.image}
-                    onChange={(e) => setNewAuthor({...newAuthor, image: e.target.value})}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">نبذة (Bio)</label>
-                  <textarea 
-                    rows={3}
-                    required
-                    className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={newAuthor.bio}
-                    onChange={(e) => setNewAuthor({...newAuthor, bio: e.target.value})}
-                  />
-                </div>
-
-                <div className="flex gap-3 mt-6">
-                  <button 
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg"
-                  >
-                    إلغاء
-                  </button>
-                  <button 
-                    type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
-                  >
-                    حفظ
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
     </section>
   )
 }

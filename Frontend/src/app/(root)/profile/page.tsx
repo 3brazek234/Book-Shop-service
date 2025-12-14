@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UpdateProfileInput, updateProfileSchema } from "@/lib/validation";
-import { updateProfile as updateProfileService } from "@/services/auth";
+import { updateProfile as updateProfileService } from "@/services/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -27,8 +27,8 @@ const UpdateProfile = () => {
         try {
             await updateProfileService(data);
             toast.success("Profile updated successfully");
-            await refetchUser(); // Refresh user data
-            setPreviewImage(user?.image || null); // Update preview
+            await refetchUser(); 
+            setPreviewImage(user?.image || null); 
         } catch (error) {
             toast.error("Failed to update profile");
             console.error(error);
@@ -51,14 +51,21 @@ const UpdateProfile = () => {
         <div className="max-w-md mx-auto p-6 bg-white/5 rounded-lg border border-white/10">
             <h2 className="text-2xl font-bold text-white mb-6 text-center">Update Profile</h2>
             
-            {/* Current Profile Image */}
-            <div className="flex justify-center mb-6">
-                <Avatar className="w-24 h-24">
+            <div className="flex justify-center mb-6 relative">
+                <Avatar className="w-24 h-24 cursor-pointer" onClick={() => document.getElementById('image-upload')?.click()}>
                     <AvatarImage src={previewImage || user?.image} alt="Profile" />
                     <AvatarFallback className="text-white bg-gray-600">
                         {user?.name?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                 </Avatar>
+                <Button
+                    type="button"
+                    size="sm"
+                    className="absolute bottom-0 right-1/2 translate-x-12 bg-amber-400 hover:bg-amber-500 text-gray-900 rounded-full w-8 h-8 p-0"
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                >
+                    📷
+                </Button>
             </div>
 
             <Form {...updateProfileForm}>
@@ -111,14 +118,13 @@ const UpdateProfile = () => {
                         control={updateProfileForm.control}
                         name="image"
                         render={({ field: { value, onChange, ...field } }) => (
-                            <FormItem>
-                                <FormLabel className="text-white">Profile Image</FormLabel>
+                            <FormItem className="hidden">
                                 <FormControl>
                                     <Input
+                                        id="image-upload"
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageChange}
-                                        className="bg-white/5 border-white/10 text-white file:bg-amber-400 file:text-gray-900 file:border-none file:rounded file:px-2 file:py-1 file:mr-2 file:font-medium"
                                         {...field}
                                     />
                                 </FormControl>

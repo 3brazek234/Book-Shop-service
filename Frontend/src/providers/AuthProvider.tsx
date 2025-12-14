@@ -1,10 +1,14 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation' // 👈 مهم جداً عشان التوجيه
 import { User } from '@/types' 
-import { getMe } from '@/services/auth'
+import { getMe } from '@/services/auth' // 👈 تأكد إن logoutService موجودة هنا
+import { deleteCookie } from '@/lib/utils'
+import { logoutUser } from '@/services'
 
+// 1. تحديث تعريف الأنواع ليشمل logout
 type AuthContextType = {
   user: User | null
   isLoggedIn: boolean
@@ -12,9 +16,11 @@ type AuthContextType = {
   isLoginModalOpen: boolean
   openLoginModal: () => void
   closeLoginModal: () => void
-  refetchUser: () => Promise<void> // خليناها ترجع Promise عشان ننتظرها
+  refetchUser: () => Promise<void>
+  logout: () => Promise<void> // 👈 ضفناها هنا
 }
 
+// 2. تحديث القيمة الافتراضية
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoggedIn: false,
@@ -23,6 +29,7 @@ const AuthContext = createContext<AuthContextType>({
   openLoginModal: () => {},
   closeLoginModal: () => {},
   refetchUser: async () => {},
+  logout: async () => {}, 
 })
 
 export function AuthProvider({ 
@@ -33,18 +40,17 @@ export function AuthProvider({
   isLoggedIn: boolean 
 }) {
   const queryClient = useQueryClient()
-  
+
+  // React Query لجلب اليوزر
   const { data: user, isLoading, refetch } = useQuery({
     queryKey: ['current-user'],
     queryFn: getMe,
-    // 👇 التغيير 1: شيلنا enabled عشان نقدر نعمل refetch حتى لو بادئين guest
-    // enabled: initialIsLoggedIn, 
     retry: false, 
     staleTime: 1000 * 60 * 5,
   })
 
+  // State للمودال
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false) 
-
   const openLoginModal = () => setIsLoginModalOpen(true)
   const closeLoginModal = () => setIsLoginModalOpen(false)
 
@@ -53,10 +59,21 @@ export function AuthProvider({
     await refetch()
   }
 
+  const logout = async () => {
+    try {
+      await logoutUser();
+    } catch (error) {
+      console.log("Server logout error (ignored)");
+    } finally {
+      
+      deleteCookie("token"); 
+      queryClient.setQueryData(['current-user'], null);
+      
+    }
+  };
 
+  // تحديد حالة الدخول بناءً على وجود بيانات اليوزر
   const isAuth = !!user 
-
-
 
   return (
     <AuthContext.Provider value={{
@@ -66,6 +83,7 @@ export function AuthProvider({
       isLoginModalOpen,
       openLoginModal,
       closeLoginModal,
+      logout, // 👈 تمرير الدالة للكونتكس
       refetchUser
     }}>
       {children}
