@@ -148,13 +148,18 @@ export const authService = {
     const token = await generateToken(user.id);
 
     await redisClient.set(`user:${user.id}:token`, token, {
-      EX: 7 * 24 * 60 * 60,
+      EX: 1 * 24 * 60 * 60,
     });
 
     return {
       message: "Login successful",
       token,
-      user: { id: user.id, name: user.name, email: user.email, image: user.image },
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        image: user.image,
+      },
     };
   },
   logout: async (userId: string) => {
