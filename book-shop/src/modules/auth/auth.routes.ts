@@ -39,6 +39,7 @@ authRouter.post(
   "/logout",
   (c) => {
     deleteCookie(c, "token");
+    return c.json({ message: "Logged out successfully" });
   },
   logout
 );
