@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AddBookFormInput,
-  AddBookInput,
   addBookFormSchema,
 } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,6 @@ export const AddBook = ({
     queryFn: () => getCategories(),
   });
   const onSubmit = async (data: AddBookFormInput) => {
-    // تحقق يدوي إن الصورة موجودة (لو هي إجباري)
     if (!coverImage) {
       toast.error("Please upload a cover image");
       return;
@@ -67,8 +65,6 @@ export const AddBook = ({
     setIsSubmitting(true);
     try {
       const formData = new FormData();
-
-      // 1. البيانات اللي جاية من React Hook Form
       formData.append("title", data.title);
       formData.append("price", data.price.toString());
       formData.append("categoryId", data.categoryId);
@@ -77,17 +73,12 @@ export const AddBook = ({
       if (data.publicationYear) {
         formData.append("publicationYear", data.publicationYear.toString());
       }
-
-      // 2. الصورة اللي جاية من الـ State
-      formData.append("thumbnail", coverImage); // 👈 هنا مربط الفرس
-
+      formData.append("thumbnail", coverImage); 
       console.log("Sending Form Data...");
-
       await createBook(formData);
       toast.success("Book added successfully! 📚");
       form.reset();
-      onSuccess?.(); // لو جاي من مودال، اقفله
-      setOpen?.(false); // لو جاي من Props
+      setOpen?.(false);
     } catch (error: any) {
       console.error("Error adding book:", error);
       toast.error(

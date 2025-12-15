@@ -1,18 +1,4 @@
-interface Book {
-  id: string;
-  title: string;
-  author: string;
-  genre: string;
-  rating: number;
-  total_copies: number;
-  available_copies: number;
-  description: string;
-  color: string;
-  videoUrl: string;
-  cover: string;
-  summary: string;
-  createdAt: Date | null;
-}
+
 export type Books = {
   id: string
   title: string

@@ -1,6 +1,5 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
-import { connectDB } from './config/db'
 import { authRouter } from './modules/auth/auth.routes'
 import booksRouter from './modules/books/books.routes'
 import {authorsRouter} from './modules/authors/authors.routes'
@@ -20,7 +19,6 @@ app.route('/books', booksRouter);
 app.route('/authors', authorsRouter);
 const startServer = async () => {
   try {
-    await connectDB(); 
     
     const port = 3001;
     console.log(`🚀 Server is running on port ${port}`);

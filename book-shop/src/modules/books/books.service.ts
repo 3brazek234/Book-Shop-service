@@ -1,6 +1,6 @@
 import { db } from "../../config/db";
 import { BookTable } from "../../db/schema";
-import { eq, and, ilike, asc, desc } from "drizzle-orm";
+import { eq, and, ilike, asc, desc, sql, count } from "drizzle-orm";
 import { CreateBookInput } from "./books.schema";
 
 export const booksService = {
@@ -21,66 +21,56 @@ export const booksService = {
   },
   getAllBooks: async (query: any) => {
     const page = Number(query.page) || 1;
-    const limit = Number(query.limit) || 5;
+    const limit = Number(query.limit) || 10;
     const offset = (page - 1) * limit;
     const search = query.search;
-
-    // 1. استقبال باراميترات الترتيب
-    const sortBy = query.sortBy || "createdAt"; // القيمة الافتراضية
-    const sortOrder = query.sortOrder || "desc"; // القيمة الافتراضية (الأحدث أولاً)
+    const sortBy = query.sortBy || "createdAt";
+    const sortOrder = query.sortOrder || "desc";
 
     const whereConditions = [];
     if (search) {
       whereConditions.push(ilike(BookTable.title, `%${search}%`));
     }
 
-    // 2. تحديد منطق الترتيب
-    let orderByCondition;
-
-    // بنشوف المستخدم عايز يرتب بإيه، وبنرجع العمود المناسب من الجدول
-    switch (sortBy) {
-      case "price":
-        orderByCondition =
-          sortOrder === "asc" ? asc(BookTable.price) : desc(BookTable.price);
-        break;
-      case "title":
-        orderByCondition =
-          sortOrder === "asc" ? asc(BookTable.title) : desc(BookTable.title);
-        break;
-      case "createdAt":
-      default:
-        orderByCondition =
-          sortOrder === "asc" ? asc(BookTable.id) : desc(BookTable.id);
-        break;
-    }
-
+    const orderByCondition =
+      sortBy === "price"
+        ? sortOrder === "asc"
+          ? asc(BookTable.price)
+          : desc(BookTable.price)
+        : sortBy === "title"
+        ? sortOrder === "asc"
+          ? asc(BookTable.title)
+          : desc(BookTable.title)
+        : sortOrder === "asc"
+        ? asc(BookTable.id)
+        : desc(BookTable.id);
     const books = await db.query.BookTable.findMany({
       where: whereConditions.length > 0 ? and(...whereConditions) : undefined,
       limit: limit,
       offset: offset,
       orderBy: orderByCondition,
       with: {
-        category: {
-          columns: {
-            id: true,
-            name: true,
-          },
-        },
-        user: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
+        category: { columns: { id: true, name: true } },
+        user: { columns: { id: true, name: true, email: true } },
       },
     });
+    const [totalResult] = await db
+      .select({ count: count() })
+      .from(BookTable)
+      .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
-    if (!books) {
-      throw new Error("Books not found");
-    }
+    const totalBooks = totalResult.count;
+    const totalPages = Math.ceil(totalBooks / limit);
 
-    return books;
+    return {
+      books,
+      pagination: {
+        total: totalBooks,
+        totalPages,
+        page,
+        limit,
+      },
+    };
   },
   getMyBooks: async (userId: string, query: any) => {
     const page = Number(query.page) || 1;

@@ -81,7 +81,11 @@ export const AuthModal = () => {
             <a href="/profile">Profile</a>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-
+ <DropdownMenuItem className="cursor-pointer">
+            <UserIcon className="mr-2 h-4 w-4" />
+            <a href="/my-library">My Library</a>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-100"
             onClick={logout}

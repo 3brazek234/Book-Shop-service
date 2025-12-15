@@ -7,11 +7,7 @@ export const createBookSchema = z.object({
   categoryId: z.string().uuid(),
   authorId: z.string().uuid(),
   publicationYear: z.preprocess((val) => Number(val), z.number().optional()), 
-  
-  thumbnail: z.union([
-    z.custom<File>((val) => val instanceof File), 
-    z.string()
-  ]).optional().nullable(),
+  thumbnail: z.any().optional(),
 });
 
 export const queryBookSchema = z.object({

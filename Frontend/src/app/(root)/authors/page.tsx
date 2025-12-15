@@ -34,8 +34,6 @@ const initialAuthors: Author[] = [
 export default function AuthorsList() {
   const [authors, setAuthors] = useState<Author[]>(initialAuthors)
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  // State للبيانات الجديدة
   const [newAuthor, setNewAuthor] = useState({ name: '', bio: '', image: '' })
 
   // دالة إضافة مؤلف جديد

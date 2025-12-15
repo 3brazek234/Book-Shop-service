@@ -44,12 +44,22 @@ export const getAllBooks = async (c: Context) => {
 };
 export const getMyBooks = async (c: Context) => {
   try {
-    const user = c.get("jwtPayload");
+    // تأكد إن الميدل وير بتاع الـ Auth شغال وبيرجع jwtPayload
+    const user = c.get("jwtPayload"); 
+    
+    // أو c.get('user') لو عملت التعديل اللي قولنا عليه قبل كده
+    // const user = c.get("user"); 
+
     const query = c.req.query();
 
-    const books = await booksService.getMyBooks(user.id, query);
-    return c.json({ success: true, data: books }, 200);
+    // هنا النتيجة هتبقى فيها { books, pagination }
+    const result = await booksService.getMyBooks(user.id, query);
+
+    // بنرجع النتيجة في data
+    return c.json({ success: true, data: result }, 200);
+    
   } catch (error: any) {
+    console.error("Get My Books Error:", error);
     return c.json({ success: false, message: error.message }, 500);
   }
 };

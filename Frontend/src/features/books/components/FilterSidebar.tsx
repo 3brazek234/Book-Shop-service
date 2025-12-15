@@ -20,19 +20,6 @@ export interface FilterState {
   sortOrder?: "asc" | "desc"
 }
 
-const CATEGORIES = [
-  "Fiction",
-  "Non-Fiction",
-  "Science Fiction",
-  "Mystery",
-  "Romance",
-  "Thriller",
-  "Biography",
-  "History",
-  "Self-Help",
-  "Fantasy",
-]
-
 const SORT_OPTIONS = [
   { value: "title", label: "Title" },
   { value: "author", label: "Author" },
@@ -72,7 +59,7 @@ export const FilterSidebar = ({ onFilterChange, onClose }: FilterSidebarProps) =
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="text-white/70 hover:text-white"
+            className="text-black"
           >
             ✕
           </Button>
@@ -103,7 +90,7 @@ export const FilterSidebar = ({ onFilterChange, onClose }: FilterSidebarProps) =
         <select
           value={filters.sortBy || "createdAt"}
           onChange={(e) => updateFilter("sortBy", e.target.value)}
-          className="w-full h-9 rounded-md border bg-white/5 border-white/10 text-white px-3 py-1 text-sm"
+          className="w-full h-9 rounded-md border bg-white/5 border-white/10 text-black px-3 py-1 text-sm"
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -121,7 +108,7 @@ export const FilterSidebar = ({ onFilterChange, onClose }: FilterSidebarProps) =
         <select
           value={filters.sortOrder || "desc"}
           onChange={(e) => updateFilter("sortOrder", e.target.value)}
-          className="w-full h-9 rounded-md border bg-white/5 border-white/10 text-white px-3 py-1 text-sm"
+          className="w-full h-9 rounded-md border bg-white/5 border-white/10 text-black px-3 py-1 text-sm"
         >
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
@@ -131,8 +118,8 @@ export const FilterSidebar = ({ onFilterChange, onClose }: FilterSidebarProps) =
       <Separator className="bg-white/10 mb-6" />
 
       {/* Category Filter */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-white/90 mb-2">
+      {/* <div className="mb-6">
+        <label className="block text-sm font-medium text-black mb-2">
           Category
         </label>
         <select
@@ -147,7 +134,7 @@ export const FilterSidebar = ({ onFilterChange, onClose }: FilterSidebarProps) =
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
 
       {/* Price Range */}
       <div className="mb-6">
