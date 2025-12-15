@@ -1,7 +1,9 @@
 # Books Shop API
 
 A robust RESTful API for a Books Shop, built with **Hono.js**, **Drizzle ORM**, and **TypeScript**. This project follows a Feature-based MVC architecture and emphasizes clean code, validation, and comprehensive testing.
+
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-View%20Image-blue?logo=docker&logoColor=white)](https://hub.docker.com/r/ahmedhamdy6778/books-shop-api)
+
 ## Tech Stack
 - **Framework:** [Hono.js](https://hono.dev/) (Fast, lightweight web standard)
 - **Language:** TypeScript
