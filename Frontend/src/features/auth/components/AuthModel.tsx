@@ -14,14 +14,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
-import { LogIn, User as UserIcon, LogOut, Settings } from "lucide-react";
-
-// Types and Context
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LogIn, User as UserIcon, LogOut } from "lucide-react";
 import { AuthView } from "@/types";
 import { useAuth } from "@/providers/AuthProvider";
 
@@ -29,8 +23,7 @@ import { useAuth } from "@/providers/AuthProvider";
 import { LoginForm } from "./LoginForm";
 import SignupForm from "./SignupForm";
 import VerifyAccount from "./VerifyAccount";
-// Assuming this component exists based on your usage
-import ForgetPassForm from "./ForgetPassForm"; 
+import ForgetPassForm from "./ForgetPassForm";
 
 export const AuthModal = () => {
   const [view, setView] = useState<AuthView>("LOGIN");
@@ -53,15 +46,15 @@ export const AuthModal = () => {
         return "Authentication";
     }
   };
-
-  // 2. LOGGED IN VIEW: Render the User Dropdown
   if (isLoggedIn && user) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger className="outline-none">
           <Avatar className="cursor-pointer border-2 border-transparent hover:border-white/50 transition">
             <AvatarImage src={user.image} alt={user.name} />
-            <AvatarFallback>{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
+            <AvatarFallback>
+              {user.name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
 
@@ -81,7 +74,7 @@ export const AuthModal = () => {
             <a href="/profile">Profile</a>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
- <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem className="cursor-pointer">
             <UserIcon className="mr-2 h-4 w-4" />
             <a href="/my-library">My Library</a>
           </DropdownMenuItem>
@@ -121,7 +114,9 @@ export const AuthModal = () => {
 
           {view === "LOGIN" && <LoginForm onSwitchView={setView} />}
           {view === "SIGNUP" && <SignupForm onSwitchView={setView} />}
-          {view === "FORGOT_PASSWORD" && <ForgetPassForm onSwitchView={setView} />}
+          {view === "FORGOT_PASSWORD" && (
+            <ForgetPassForm onSwitchView={setView} />
+          )}
           {view === "OTP" && <VerifyAccount onSwitchView={setView} />}
         </div>
       </DialogContent>

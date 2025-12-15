@@ -22,7 +22,10 @@ async function getPublicBooks(searchParams: any) {
   if (!res.ok) {
      return { data: { books: [], pagination: { total: 0, totalPages: 0, page: 1, limit: 10 } } };
   }
-  return res.json();
+    const jsonResponse = await res.json();
+    
+    console.log("✅ Parsed Data:", JSON.stringify(jsonResponse, null, 2));
+  return jsonResponse;
 }
 
 export default async function LibraryPage({
@@ -33,7 +36,7 @@ export default async function LibraryPage({
   const resolvedSearchParams = await searchParams;
 
   const response = await getPublicBooks(resolvedSearchParams);
-  const books = response?.data?.books || [];
+  const books = response?.data?.formattedBook || [];
   const pagination = response?.data?.pagination || { total: 0, totalPages: 0, page: 1, limit: 10 };
 
   return (

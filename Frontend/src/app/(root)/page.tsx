@@ -1,9 +1,8 @@
 import { sampleBooks } from "@/constant";
-import BookCard from "@/features/books/components/BookCard";
 import BookOverView from "@/features/books/components/BookOverView";
 import BorrowNow from "@/features/books/components/BorrowNow";
 import React from "react";
-
+import BookCard from "@/features/books/components/BookCard";
 function Home() {
   return (
     <>
@@ -16,7 +15,7 @@ function Home() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-">
         {sampleBooks.map((book) => (
           <BookCard key={book.id} {...book} />
         ))}

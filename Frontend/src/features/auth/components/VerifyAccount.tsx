@@ -7,9 +7,10 @@ import { verifyOtp, resendOtp } from "@/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { AuthView } from '@/types';
 
 interface VerifyAccountProps {
-    onSwitchView?: (view: string) => void;
+    onSwitchView?: (view: AuthView) => void;
 }
 
 const VerifyAccount = ({  onSwitchView }: VerifyAccountProps) => {
@@ -82,7 +83,7 @@ const VerifyAccount = ({  onSwitchView }: VerifyAccountProps) => {
 
     const onResendOtp = async () => {
         try {
-            await resendOtp({ email });
+            // await resendOtp({ email });
             toast.success("OTP sent successfully");
         } catch (error) {
             toast.error("Failed to resend OTP");
@@ -93,9 +94,7 @@ const VerifyAccount = ({  onSwitchView }: VerifyAccountProps) => {
     return (
         <div className="max-w-md mx-auto p-6 bg-white/5 rounded-lg border border-white/10">
             <h2 className="text-2xl font-bold text-white mb-6 text-center">Verify Account</h2>
-            <p className="text-white/70 text-center mb-6">
-                Enter the 6-digit code sent to {email}
-            </p>
+          
 
             <Form {...verifyForm}>
                 <form

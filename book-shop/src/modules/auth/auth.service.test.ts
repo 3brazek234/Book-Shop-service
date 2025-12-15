@@ -229,7 +229,7 @@ describe("AuthService", () => {
     });
   });
 
-  // --- RESET PASSWORD TESTS ---
+
   describe("resetPassword", () => {
     const input = { email: "test@example.com", otp: "123456", password: "newpassword" };
 

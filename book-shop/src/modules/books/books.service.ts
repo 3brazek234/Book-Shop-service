@@ -52,6 +52,16 @@ export const booksService = {
       with: {
         category: { columns: { id: true, name: true } },
         user: { columns: { id: true, name: true, email: true } },
+        tags: {
+          with: {
+            tag: {
+              columns: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
     const [totalResult] = await db
@@ -61,9 +71,12 @@ export const booksService = {
 
     const totalBooks = totalResult.count;
     const totalPages = Math.ceil(totalBooks / limit);
-
+    const formattedBook = books.map((book) => ({
+      ...book,
+      tags: book.tags.map((t) => t.tag),
+    }));
     return {
-      books,
+      formattedBook,
       pagination: {
         total: totalBooks,
         totalPages,

@@ -1,170 +1,160 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
-import { booksService } from './books.service';
-import { db } from '../../config/db'; 
-import { BookTable } from '../../db/schema'; 
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { booksService } from './books.service'; // Adjust path as needed
+import { db } from '../../config/db'; // Adjust path as needed
+import { BookTable } from '../../db/schema'; // Adjust path as needed
+
+// 1. Mock the DB module
 vi.mock('../../config/db', () => ({
   db: {
     insert: vi.fn(),
+    select: vi.fn(),
     query: {
       BookTable: {
         findMany: vi.fn(),
         findFirst: vi.fn(),
       },
     },
-    select: vi.fn(),
   },
 }));
 
-describe('BooksService', () => {
+describe('Books Service', () => {
+  // Clear mocks after each test to ensure clean state
   afterEach(() => {
     vi.clearAllMocks();
   });
 
   describe('createBook', () => {
     it('should insert a new book and return it', async () => {
-      const userId = 'user-123';
-      const inputData = {
-        title: 'New Book',
-        description: 'Desc',
+      const mockUserId = 'user-123';
+      const mockInput = {
+        title: 'Test Book',
+        description: 'Test Desc',
         price: "100",
         categoryId: 'cat-1',
         authorId: 'auth-1',
         thumbnail: 'image.jpg',
       };
 
-      const mockReturnedBook = { id: 'book-1', ...inputData, userId };
+      const mockReturnedBook = { id: 'book-1', ...mockInput, price: '100' };
 
-      // Chainable Mocking for Drizzle insert
-      // db.insert().values().returning()
+      // Mocking the chain: insert -> values -> returning
       const returningMock = vi.fn().mockResolvedValue([mockReturnedBook]);
       const valuesMock = vi.fn().mockReturnValue({ returning: returningMock });
-      const insertMock = vi.fn().mockReturnValue({ values: valuesMock });
-      
-      (db.insert as any).mockImplementation(insertMock);
+      vi.mocked(db.insert).mockReturnValue({ values: valuesMock } as any);
 
-      const result = await booksService.createBook(userId, inputData);
+      const result = await booksService.createBook(mockUserId, mockInput);
 
-      expect(insertMock).toHaveBeenCalledWith(BookTable);
-      expect(valuesMock).toHaveBeenCalledWith(expect.objectContaining({
-        title: inputData.title,
-        userId: userId,
-        price: "100" 
-      }));
+      // Assertions
+      expect(db.insert).toHaveBeenCalledWith(BookTable);
+      expect(valuesMock).toHaveBeenCalledWith({
+        title: mockInput.title,
+        description: mockInput.description,
+        price: '100', // Converted to string in service
+        categoryId: mockInput.categoryId,
+        authorId: mockInput.authorId,
+        userId: mockUserId,
+        coverImage: mockInput.thumbnail,
+      });
       expect(result).toEqual(mockReturnedBook);
     });
   });
 
   describe('getAllBooks', () => {
-    it('should return paginated books and pagination info', async () => {
-      // Arrange
-      const query = { page: 1, limit: 10, search: 'Test' };
-      const mockBooks = [{ id: '1', title: 'Test Book' }];
-      const mockCount = [{ count: 50 }]; // فرضنا ان فيه 50 كتاب
+    it('should return paginated and formatted books with default query params', async () => {
+      const mockBooks = [
+        {
+          id: '1',
+          title: 'Book 1',
+          tags: [{ tag: { id: 't1', name: 'Fiction' } }], // Nested structure
+        },
+      ];
+      
+      vi.mocked(db.query.BookTable.findMany).mockResolvedValue(mockBooks as any);
 
-      // Mock findMany
-      (db.query.BookTable.findMany as any).mockResolvedValue(mockBooks);
-
-      // Mock select count query
-      // db.select().from().where()
-      const whereMock = vi.fn().mockResolvedValue(mockCount);
+      const whereMock = vi.fn().mockResolvedValue([{ count: 1 }]);
       const fromMock = vi.fn().mockReturnValue({ where: whereMock });
-      (db.select as any).mockReturnValue({ from: fromMock });
+      vi.mocked(db.select).mockReturnValue({ from: fromMock } as any);
 
-      // Act
+      const query = {}; // Empty query
       const result = await booksService.getAllBooks(query);
 
-      // Assert
-      expect(db.query.BookTable.findMany).toHaveBeenCalled();
-      expect(result.books).toEqual(mockBooks);
+      // Check formatting (tags should be flattened)
+      expect(result.formattedBook[0].tags).toEqual([{ id: 't1', name: 'Fiction' }]);
+      
+      // Check pagination calculation
       expect(result.pagination).toEqual({
-        total: 50,
-        totalPages: 5, // 50 / 10 = 5
+        total: 1,
+        totalPages: 1,
         page: 1,
-        limit: 10
+        limit: 10,
       });
+
+      // Verify DB calls defaults
+      expect(db.query.BookTable.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        limit: 10,
+        offset: 0,
+      }));
     });
 
-    it('should use default values for pagination if not provided', async () => {
-        // Arrange
-        const query = {}; // No params
-        const mockBooks : any = [];
-        const mockCount = [{ count: 0 }];
-  
-        (db.query.BookTable.findMany as any).mockResolvedValue(mockBooks);
-        
-        // Mocking the chain for count
-        const whereMock = vi.fn().mockResolvedValue(mockCount);
+    it('should handle search queries', async () => {
+        // Setup minimal mocks to avoid crashes
+        vi.mocked(db.query.BookTable.findMany).mockResolvedValue([]);
+        const whereMock = vi.fn().mockResolvedValue([{ count: 0 }]);
         const fromMock = vi.fn().mockReturnValue({ where: whereMock });
-        (db.select as any).mockReturnValue({ from: fromMock });
-  
-        // Act
-        const result = await booksService.getAllBooks(query);
-  
-        // Assert
-        expect(result.pagination.page).toBe(1);
-        expect(result.pagination.limit).toBe(10);
-      });
+        vi.mocked(db.select).mockReturnValue({ from: fromMock } as any);
+
+        const query = { search: 'Harry Potter' };
+        await booksService.getAllBooks(query);
+        expect(db.query.BookTable.findMany).toHaveBeenCalled();
+        expect(whereMock).toHaveBeenCalled();
+    });
   });
 
   describe('getMyBooks', () => {
-    it('should return user specific books', async () => {
-      // Arrange
-      const userId = 'user-123';
-      const query = { page: 1 };
-      const mockBooks = [{ id: '1', title: 'My Book', userId }];
+    it('should return books for a specific user', async () => {
+      const mockUserId = 'user-123';
+      const mockBooks = [{ id: '1', title: 'My Book' }];
+      
+      vi.mocked(db.query.BookTable.findMany).mockResolvedValue(mockBooks as any);
 
-      (db.query.BookTable.findMany as any).mockResolvedValue(mockBooks);
+      const result = await booksService.getMyBooks(mockUserId, { page: 1, limit: 3 });
 
-      // Act
-      const result = await booksService.getMyBooks(userId, query);
-
-      // Assert
-      expect(db.query.BookTable.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-            limit: 3, 
-            with: { category: true }
-        })
-      );
       expect(result).toEqual(mockBooks);
+      expect(db.query.BookTable.findMany).toHaveBeenCalledWith(expect.objectContaining({
+        limit: 3,
+        with: { category: true },
+     
+      }));
     });
   });
 
   describe('getBookById', () => {
-    it('should return a book with relations if found', async () => {
-      // Arrange
-      const bookId = 'book-1';
+    it('should return a single book with relations', async () => {
       const mockBook = { 
-        id: bookId, 
-        title: 'Details',
-        category: { id: 1, name: 'Tech' } 
+        id: '1', 
+        title: 'Detailed Book',
+        author: { name: 'John' } 
       };
 
-      (db.query.BookTable.findFirst as any).mockResolvedValue(mockBook);
+      vi.mocked(db.query.BookTable.findFirst).mockResolvedValue(mockBook as any);
 
-      // Act
-      const result = await booksService.getBookById(bookId);
+      const result = await booksService.getBookById('1');
 
-      // Assert
-      expect(db.query.BookTable.findFirst).toHaveBeenCalledWith(
-        expect.objectContaining({
-            with: expect.objectContaining({
-                author: expect.any(Object),
-                tags: expect.any(Object)
-            })
-        })
-      );
       expect(result).toEqual(mockBook);
+      expect(db.query.BookTable.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+        with: expect.objectContaining({
+            author: expect.any(Object),
+            category: expect.any(Object),
+            user: expect.any(Object),
+            tags: expect.any(Object)
+        })
+      }));
     });
 
     it('should return undefined if book not found', async () => {
-        // Arrange
-        (db.query.BookTable.findFirst as any).mockResolvedValue(undefined);
-  
-        // Act
-        const result = await booksService.getBookById('non-existent');
-  
-        // Assert
+        vi.mocked(db.query.BookTable.findFirst).mockResolvedValue(undefined);
+        const result = await booksService.getBookById('999');
         expect(result).toBeUndefined();
-      });
+    });
   });
 });

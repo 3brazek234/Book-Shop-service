@@ -28,14 +28,12 @@ const ForgetPassForm = ({ onSwitchView }: { onSwitchView: (view: AuthView) => vo
     const res = await forgetPassword(data.email);
     if (res.success) {
       toast.success("Password reset otp sent to your email");
-      onSwitchView("LOGIN");
+      onSwitchView("OTP");
     } else {
       toast.error(res.message || "Error in sending reset link");
     }
   }
-  const onSwitch = (view: AuthView) => {
-    onSwitchView(view);
-  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
