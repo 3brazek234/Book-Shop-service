@@ -7,21 +7,11 @@ const runMigration = async () => {
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
   });
-
   await client.connect();
-
   const db = drizzle(client);
-
-  console.log(" ⏳ Running migrations...");
-
-  
   await migrate(db, { migrationsFolder: "drizzle" });
-
-  console.log("✅ Migrations completed successfully!");
   await client.end();
 };
-
 runMigration().catch((err) => {
-  console.error("❌ Migration failed!", err);
   process.exit(1);
 });

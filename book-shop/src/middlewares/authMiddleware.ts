@@ -6,6 +6,5 @@ export const authCookieBridge = createMiddleware(async (c, next) => {
   if (token) {
     c.req.raw.headers.set("Authorization", `Bearer ${token}`);
   }
-
   await next();
 });

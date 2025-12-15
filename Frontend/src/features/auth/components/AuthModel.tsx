@@ -24,6 +24,7 @@ import { LoginForm } from "./LoginForm";
 import SignupForm from "./SignupForm";
 import VerifyAccount from "./VerifyAccount";
 import ForgetPassForm from "./ForgetPassForm";
+import Link from "next/link";
 
 export const AuthModal = () => {
   const [view, setView] = useState<AuthView>("LOGIN");
@@ -71,12 +72,12 @@ export const AuthModal = () => {
 
           <DropdownMenuItem className="cursor-pointer">
             <UserIcon className="mr-2 h-4 w-4" />
-            <a href="/profile">Profile</a>
+            <Link href="/profile">Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="cursor-pointer">
             <UserIcon className="mr-2 h-4 w-4" />
-            <a href="/my-library">My Library</a>
+            <Link href="/my-library">My Library</Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
