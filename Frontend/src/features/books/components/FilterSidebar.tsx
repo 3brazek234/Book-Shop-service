@@ -34,7 +34,7 @@ export const FilterSidebar = ({ onFilterChange, onClose }: FilterSidebarProps) =
     sortOrder: "desc",
   })
 
-  const updateFilter = (key: keyof FilterState, value: any) => {
+  const updateFilter = (key: keyof FilterState, value: string | number | undefined) => {
     const newFilters = { ...filters, [key]: value }
     setFilters(newFilters)
     onFilterChange(newFilters)

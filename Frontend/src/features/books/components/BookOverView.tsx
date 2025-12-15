@@ -2,6 +2,7 @@ import star from "@/assets/icons/star.svg";
 import Image from "next/image";
 import BorrowBtn from "./BorrowBtn";
 import BookCover from "./BookCover";
+import { Book } from "@/types";
 function BookOverView({
   title,
   author,

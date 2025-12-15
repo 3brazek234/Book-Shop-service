@@ -1,7 +1,6 @@
 import LibraryView from "@/components/LibraryView";
 import { cookies } from "next/headers";
 
-// 1. دالة بناء الكويري
 const buildQueryString = (params: { [key: string]: string | string[] | undefined }) => {
   const query = new URLSearchParams();
   Object.entries(params).forEach(([key, value]) => {
@@ -22,7 +21,7 @@ async function getMyBooks(searchParams: any) {
   const token = cookieStore.get("token")?.value;
 
   if (!token) {
-    return null; // نرجع null لو مفيش توكن
+    return null; 
   }
 
   try {

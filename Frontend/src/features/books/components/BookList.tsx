@@ -3,27 +3,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import { BookDetailsDialog } from "./BookDetailsDialog";
+import { Books } from "../../../../types";
 
-// Update the interface to include all fields you might want to show in details
-interface Book {
-  id: string;
-  title: string;
-  description: string;
-  coverImage: string;
-  createdAt: Date | null;
-  // Add these fields so they are available for the dialog
-  price: string;
-  publicationYear: number | null;
-  user: {
-    name: string;
-  };
-  category: {
-    name: string;
-  };
-}
+
 
 interface BookListProps {
-  books: Book[];
+  books: Books[];
   title?: string;
 }
 
@@ -31,7 +16,7 @@ export default function BookList({
   books,
   title = "All Books",
 }: BookListProps) {
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [selectedBook, setSelectedBook] = useState<Books | null>(null);
   const isDialogOpen = !!selectedBook;
   const handleCloseDialog = () => {
     setSelectedBook(null);
